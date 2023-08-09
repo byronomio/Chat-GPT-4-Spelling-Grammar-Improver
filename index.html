@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat GPT-4 Spelling and Grammar Improver</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="text-center">Chat GPT-4 Spelling and Grammar Improver</h2>
+        <p class="text-center">Fix my spelling and my grammar but don't change it too much.</p>
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group">
+                    <textarea class="form-control" id="userInput" placeholder="Enter your custom text here"></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" style="width:88px;" onclick="fetchResponse()">
+                        <span id="buttonText">Improve</span>
+                        <div id="spinner" class="spinner-border spinner-border-sm d-none" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyToClipboard()">Copy Response</button>
+                </div>
+                <div>
+                    <div id="responseContainer" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function fetchResponse() {
+            const userInput = document.getElementById('userInput').value;
+
+            // Hide text and show spinner
+            document.getElementById('buttonText').classList.add('d-none');
+            document.getElementById('spinner').classList.remove('d-none');
+
+            fetch('process.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userInput: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let responseDiv = document.createElement("p");
+                responseDiv.innerText = data.message;
+                document.getElementById('responseContainer').appendChild(responseDiv);
+
+                // Show text and hide spinner
+                document.getElementById('buttonText').classList.remove('d-none');
+                document.getElementById('spinner').classList.add('d-none');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                // Show text and hide spinner
+                document.getElementById('buttonText').classList.remove('d-none');
+                document.getElementById('spinner').classList.add('d-none');
+            });
+        }
+
+        function copyToClipboard() {
+            const textArea = document.createElement("textarea");
+            textArea.value = Array.from(document.getElementById('responseContainer').children)
+                                  .map(p => p.innerText)
+                                  .join('\n');
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+    </script>
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
